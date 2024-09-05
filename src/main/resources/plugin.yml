@@ -1,0 +1,7 @@
+name: kumaAntiCheat
+version: '${project.version}'
+main: me.kuma.kumaanticheat.KumaAntiCheat
+depend: [ProtocolLib]
+commands:
+  sampling:
+    description: manage sampling

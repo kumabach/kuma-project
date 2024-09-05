@@ -1,0 +1,7 @@
+name: kumaAntiCheat
+version: '1.0-SNAPSHOT'
+main: me.kuma.kumaanticheat.KumaAntiCheat
+depend: [ProtocolLib]
+commands:
+  sampling:
+    description: manage sampling
