@@ -2,7 +2,7 @@ package me.kuma.kumaanticheat.commands;
 
 import me.kuma.kumaanticheat.KumaAntiCheat;
 import me.kuma.kumaanticheat.forsampling.samplingmng;
-import me.kuma.kumaanticheat.pairdata;
+import me.kuma.kumaanticheat.forsampling.pairdata;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -10,8 +10,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import java.util.UUID;
-
-import static java.util.Collections.swap;
 
 public class startSampling implements CommandExecutor {
 

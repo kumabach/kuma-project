@@ -1,4 +1,4 @@
-package me.kuma.kumaanticheat;
+package me.kuma.kumaanticheat.forsampling;
 
 import java.util.Objects;
 

@@ -1,14 +1,10 @@
 package me.kuma.kumaanticheat.forsampling;
 
 import me.kuma.kumaanticheat.listeners.dealdamage;
-import me.kuma.kumaanticheat.packetdata;
-import me.kuma.kumaanticheat.pairdata;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.Vector;
 
 import java.io.BufferedWriter;
 import java.io.File;
