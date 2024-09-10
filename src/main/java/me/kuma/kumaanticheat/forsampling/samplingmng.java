@@ -10,10 +10,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static sun.swing.MenuItemLayoutHelper.max;
 
@@ -21,7 +18,7 @@ public class samplingmng {
 
     public static HashMap<pairdata, samplingmng> sampmap = new HashMap<>();
 
-    private List<packetdata> xlist = new ArrayList<>();
+    public Deque<packetdata> dataList = new ArrayDeque<>();
     public BukkitRunnable task;
     private JavaPlugin plugin;
     public UUID a_uuid;
@@ -29,6 +26,9 @@ public class samplingmng {
     public static Integer lastFileNum;
 
     static final long clt = 500;
+    static final int datasize = 300;
+    static final int damage_hit_count_threshold = 100;
+    private int hitCounter;
 
     // コンストラクタでJavaPluginのインスタンスを受け取る
     public samplingmng(JavaPlugin plugin, pairdata pd) {
@@ -38,6 +38,8 @@ public class samplingmng {
     }
 
     public void startTracking() {
+
+        hitCounter = 0;
 
         if (task != null) {
             task.cancel(); // すでにタスクが存在する場合はキャンセル
@@ -67,36 +69,56 @@ public class samplingmng {
                 int a_flag;
                 int b_flag;
 
-                if (dealdamage.hitmap.get(a_uuid) == null) a_flag = 0;
+                pairdata<UUID, UUID> pd1 = new pairdata<>(a_uuid, b_uuid);
+                pairdata<UUID, UUID> pd2 = new pairdata<>(b_uuid, a_uuid);
+
+                if (dealdamage.hitmap.get(pd1) == null){
+                    a_flag = 0;
+                }
                 else {
-                    long lasthit = dealdamage.hitmap.get(a_uuid);
+                    long lasthit = dealdamage.hitmap.get(pd1);
                     a_flag = (t - lasthit > clt ? 0 : 1);
                 }
-
-                A.sendMessage(String.valueOf(a_flag));
-
-                if (dealdamage.hitmap.get(b_uuid) == null) b_flag = 0;
+                if (dealdamage.hitmap.get(pd2) == null){
+                    b_flag = 0;
+                }
                 else {
-                    long lasthit = dealdamage.hitmap.get(b_uuid);
+                    long lasthit = dealdamage.hitmap.get(pd2);
                     b_flag = (t - lasthit > clt ? 0 : 1);
                 }
 
-
                 // 座標データをリストに追加
-                xlist.add(new packetdata(ax, ay, az, a_flag, b_flag));
+                dataList.addLast(new packetdata(ax, ay, az, a_flag, b_flag));
+                if(a_flag == 1) hitCounter++;
+
+                if(dataList.size() == datasize){
+                    if(hitCounter>damage_hit_count_threshold){
+                        makecsv();
+                        dataList.clear();
+                    }
+                    else{
+                        dataList.removeFirst();
+                    }
+                }
+
             }
+
+
         };
 
-        task.runTaskTimer(this.plugin, 0L, 1L); // プラグインインスタンスを渡す
+        task.runTaskTimer(this.plugin, 0L, 5L); // プラグインインスタンスを渡す
 
+    }
+
+    private int getListSize() {
+        return dataList.size();
     }
 
     public void stopTracking() {
         if (task != null) {
             task.cancel(); // タスクをキャンセルして停止
             task = null; // タスクをnullに設定
-            makecsv();
-            xlist = new ArrayList<>();
+            dataList.clear();
         }
     }
 
@@ -123,7 +145,7 @@ public class samplingmng {
 
                 int idx = 0;
 
-                for (packetdata pd : xlist) {
+                for (packetdata pd : dataList) {
                     double x = pd.X;
                     double y = pd.Y;
                     double z = pd.Z;
