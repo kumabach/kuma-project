@@ -21,7 +21,8 @@ public class dealdamage implements Listener {
     public void onPlayerHit(EntityDamageByEntityEvent event) {
         if(event.getDamager() instanceof Player){
             UUID uuid = event.getDamager().getUniqueId();
-            hitmap.put(uuid, System.currentTimeMillis());
+            long t = System.currentTimeMillis();
+            hitmap.put(uuid, t);
         }
     }
 

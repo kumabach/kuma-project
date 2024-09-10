@@ -36,13 +36,13 @@ public class startSampling implements CommandExecutor {
             return false;
         }
 
-        int result = args[1].compareToIgnoreCase(args[2]);
-
-        if(result<0){
-            Player r = a;
-            a=b;
-            b=r; //swap
-        }
+//        int result = args[1].compareToIgnoreCase(args[2]);
+//
+//        if(result<0){
+//            Player r = a;
+//            a=b;
+//            b=r; //swap
+//        }
 
         UUID a_uuid = a.getUniqueId();
         UUID b_uuid = b.getUniqueId();

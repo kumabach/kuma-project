@@ -28,6 +28,8 @@ public class samplingmng {
     public UUID b_uuid;
     public static Integer lastFileNum;
 
+    static final long clt = 500;
+
     // コンストラクタでJavaPluginのインスタンスを受け取る
     public samplingmng(JavaPlugin plugin, pairdata pd) {
         this.plugin = plugin;
@@ -48,8 +50,6 @@ public class samplingmng {
             @Override
             public void run() {
 
-                final long clt = 1;
-
                 double ax = A.getLocation().getX();
                 double ay = A.getLocation().getY();
                 double az = A.getLocation().getZ();
@@ -62,7 +62,7 @@ public class samplingmng {
                 ay -= by;
                 az -= bz;
 
-                long t = System.nanoTime(); // System.currentTimeMillis() を System.nanoTime() に変更
+                long t = System.currentTimeMillis(); // System.currentTimeMillis() を System.nanoTime() に変更
 
                 int a_flag;
                 int b_flag;
@@ -73,11 +73,14 @@ public class samplingmng {
                     a_flag = (t - lasthit > clt ? 0 : 1);
                 }
 
+                A.sendMessage(String.valueOf(a_flag));
+
                 if (dealdamage.hitmap.get(b_uuid) == null) b_flag = 0;
                 else {
                     long lasthit = dealdamage.hitmap.get(b_uuid);
                     b_flag = (t - lasthit > clt ? 0 : 1);
                 }
+
 
                 // 座標データをリストに追加
                 xlist.add(new packetdata(ax, ay, az, a_flag, b_flag));
