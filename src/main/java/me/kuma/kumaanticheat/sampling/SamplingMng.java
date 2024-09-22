@@ -1,6 +1,6 @@
-package me.kuma.kumaanticheat.forsampling;
+package me.kuma.kumaanticheat.sampling;
 
-import me.kuma.kumaanticheat.listeners.dealdamage;
+import me.kuma.kumaanticheat.listeners.DealDamageListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,11 +14,11 @@ import java.util.*;
 
 import static sun.swing.MenuItemLayoutHelper.max;
 
-public class samplingmng {
+public class SamplingMng {
 
-    public static HashMap<pairdata, samplingmng> sampmap = new HashMap<>();
+    public static HashMap<PairData, SamplingMng> sampmap = new HashMap<>();
 
-    public Deque<packetdata> dataList = new ArrayDeque<>();
+    public Deque<PacketData> dataList = new ArrayDeque<>();
     public BukkitRunnable task;
     private JavaPlugin plugin;
     public UUID a_uuid;
@@ -31,7 +31,7 @@ public class samplingmng {
     private int hitCounter;
 
     // コンストラクタでJavaPluginのインスタンスを受け取る
-    public samplingmng(JavaPlugin plugin, pairdata pd) {
+    public SamplingMng(JavaPlugin plugin, PairData pd) {
         this.plugin = plugin;
         a_uuid = (UUID) pd.getKey();
         b_uuid = (UUID) pd.getValue();
@@ -69,31 +69,31 @@ public class samplingmng {
                 int a_flag;
                 int b_flag;
 
-                pairdata<UUID, UUID> pd1 = new pairdata<>(a_uuid, b_uuid);
-                pairdata<UUID, UUID> pd2 = new pairdata<>(b_uuid, a_uuid);
+                PairData<UUID, UUID> pd1 = new PairData<>(a_uuid, b_uuid);
+                PairData<UUID, UUID> pd2 = new PairData<>(b_uuid, a_uuid);
 
-                if (dealdamage.hitmap.get(pd1) == null){
+                if (DealDamageListener.hitmap.get(pd1) == null){
                     a_flag = 0;
                 }
                 else {
-                    long lasthit = dealdamage.hitmap.get(pd1);
+                    long lasthit = DealDamageListener.hitmap.get(pd1);
                     a_flag = (t - lasthit > clt ? 0 : 1);
                 }
-                if (dealdamage.hitmap.get(pd2) == null){
+                if (DealDamageListener.hitmap.get(pd2) == null){
                     b_flag = 0;
                 }
                 else {
-                    long lasthit = dealdamage.hitmap.get(pd2);
+                    long lasthit = DealDamageListener.hitmap.get(pd2);
                     b_flag = (t - lasthit > clt ? 0 : 1);
                 }
 
                 // 座標データをリストに追加
-                dataList.addLast(new packetdata(ax, ay, az, a_flag, b_flag));
+                dataList.addLast(new PacketData(ax, ay, az, a_flag, b_flag));
                 if(a_flag == 1) hitCounter++;
 
                 if(dataList.size() == datasize){
                     if(hitCounter>damage_hit_count_threshold){
-                        makecsv();
+                        makeCsv();
                         dataList.clear();
                     }
                     else{
@@ -122,7 +122,7 @@ public class samplingmng {
         }
     }
 
-    public void makecsv() {
+    public void makeCsv() {
         //csvファイルの保存
         Player p = Bukkit.getPlayer(this.a_uuid);
         if(lastFileNum == null) getLastname();
@@ -145,7 +145,7 @@ public class samplingmng {
 
                 int idx = 0;
 
-                for (packetdata pd : dataList) {
+                for (PacketData pd : dataList) {
                     double x = pd.X;
                     double y = pd.Y;
                     double z = pd.Z;
