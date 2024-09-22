@@ -8,9 +8,9 @@ public class PacketData {
     public int b_hit;
 
     public PacketData(double x, double y, double z, int a, int b) {
-        X=x;
-        Z=z;
-        Y=y;
+        X = x;
+        Z = z;
+        Y = y;
         a_hit = a;
         b_hit = b;
     }
