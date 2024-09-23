@@ -19,9 +19,9 @@ import static sun.swing.MenuItemLayoutHelper.max;
 
 public class SamplingMng {
 
-    static final long clt = 500;
-    static final int datasize = 300;
-    static final int damage_hit_count_threshold = 100;
+    static final long clt = 100;
+    static final int datasize = 100;
+    static final int damage_hit_count_threshold = 20;
     public static HashMap<PairData, SamplingMng> sampmap = new HashMap<>();
     public static Integer lastFileNum;
     public Deque<PacketData> dataList = new ArrayDeque<>();
@@ -90,11 +90,16 @@ public class SamplingMng {
                 dataList.addLast(new PacketData(ax, ay, az, a_flag, b_flag));
                 if (a_flag == 1) hitCounter++;
 
+                A.sendMessage(String.valueOf(a_flag));
+                B.sendMessage(String.valueOf(a_flag));
+
                 if (dataList.size() == datasize) {
                     if (hitCounter > damage_hit_count_threshold) {
                         makeCsv();
+                        hitCounter = 0;
                         dataList.clear();
                     } else {
+                        if(dataList.getFirst().a_hit == 1)hitCounter--;
                         dataList.removeFirst();
                     }
                 }
@@ -104,12 +109,8 @@ public class SamplingMng {
 
         };
 
-        task.runTaskTimer(this.plugin, 0L, 5L); // プラグインインスタンスを渡す
+        task.runTaskTimer(this.plugin, 0L, 1L); // プラグインインスタンスを渡す
 
-    }
-
-    private int getListSize() {
-        return dataList.size();
     }
 
     public void stopTracking() {
@@ -125,8 +126,9 @@ public class SamplingMng {
         Player p = Bukkit.getPlayer(this.a_uuid);
         if (lastFileNum == null) getLastname();
         lastFileNum++;
-        p.sendMessage(String.valueOf(lastFileNum));
+
         File csvFile = new File(plugin.getDataFolder(), "data_" + lastFileNum + ".csv");
+        p.sendMessage(String.valueOf(lastFileNum));
 
         // ファイルが存在しない場合は作成
         try {
@@ -162,6 +164,7 @@ public class SamplingMng {
 
     public void getLastname() {
         File[] files = this.plugin.getDataFolder().listFiles((dir, name) -> name.startsWith("data_") && name.endsWith(".csv"));
+
         lastFileNum = 0;
 
         if (files == null || files.length == 0) return;

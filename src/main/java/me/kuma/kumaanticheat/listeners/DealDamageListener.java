@@ -21,11 +21,8 @@ public class DealDamageListener implements Listener {
             UUID a_uuid = event.getDamager().getUniqueId();
             UUID b_uuid = event.getEntity().getUniqueId();
             PairData<UUID, UUID> pd1 = new PairData<>(a_uuid, b_uuid);
-            PairData<UUID, UUID> pd2 = new PairData<>(b_uuid, a_uuid);
             long t = System.currentTimeMillis();
             hitmap.put(pd1, t);
-            hitmap.put(pd2, t);
-            Bukkit.getPlayer(a_uuid).sendMessage("a");
         }
     }
 
