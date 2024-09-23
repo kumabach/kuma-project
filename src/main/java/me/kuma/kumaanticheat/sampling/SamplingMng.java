@@ -1,6 +1,6 @@
-package me.kuma.kumaanticheat.forsampling;
+package me.kuma.kumaanticheat.sampling;
 
-import me.kuma.kumaanticheat.listeners.dealdamage;
+import me.kuma.kumaanticheat.listeners.DealDamageListener;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -10,28 +10,29 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.UUID;
 
 import static sun.swing.MenuItemLayoutHelper.max;
 
-public class samplingmng {
-
-    public static HashMap<pairdata, samplingmng> sampmap = new HashMap<>();
-
-    public Deque<packetdata> dataList = new ArrayDeque<>();
-    public BukkitRunnable task;
-    private JavaPlugin plugin;
-    public UUID a_uuid;
-    public UUID b_uuid;
-    public static Integer lastFileNum;
+public class SamplingMng {
 
     static final long clt = 500;
     static final int datasize = 300;
     static final int damage_hit_count_threshold = 100;
+    public static HashMap<PairData, SamplingMng> sampmap = new HashMap<>();
+    public static Integer lastFileNum;
+    public Deque<PacketData> dataList = new ArrayDeque<>();
+    public BukkitRunnable task;
+    public UUID a_uuid;
+    public UUID b_uuid;
+    private final JavaPlugin plugin;
     private int hitCounter;
 
     // コンストラクタでJavaPluginのインスタンスを受け取る
-    public samplingmng(JavaPlugin plugin, pairdata pd) {
+    public SamplingMng(JavaPlugin plugin, PairData pd) {
         this.plugin = plugin;
         a_uuid = (UUID) pd.getKey();
         b_uuid = (UUID) pd.getValue();
@@ -69,34 +70,31 @@ public class samplingmng {
                 int a_flag;
                 int b_flag;
 
-                pairdata<UUID, UUID> pd1 = new pairdata<>(a_uuid, b_uuid);
-                pairdata<UUID, UUID> pd2 = new pairdata<>(b_uuid, a_uuid);
+                PairData<UUID, UUID> pd1 = new PairData<>(a_uuid, b_uuid);
+                PairData<UUID, UUID> pd2 = new PairData<>(b_uuid, a_uuid);
 
-                if (dealdamage.hitmap.get(pd1) == null){
+                if (DealDamageListener.hitmap.get(pd1) == null) {
                     a_flag = 0;
-                }
-                else {
-                    long lasthit = dealdamage.hitmap.get(pd1);
+                } else {
+                    long lasthit = DealDamageListener.hitmap.get(pd1);
                     a_flag = (t - lasthit > clt ? 0 : 1);
                 }
-                if (dealdamage.hitmap.get(pd2) == null){
+                if (DealDamageListener.hitmap.get(pd2) == null) {
                     b_flag = 0;
-                }
-                else {
-                    long lasthit = dealdamage.hitmap.get(pd2);
+                } else {
+                    long lasthit = DealDamageListener.hitmap.get(pd2);
                     b_flag = (t - lasthit > clt ? 0 : 1);
                 }
 
                 // 座標データをリストに追加
-                dataList.addLast(new packetdata(ax, ay, az, a_flag, b_flag));
-                if(a_flag == 1) hitCounter++;
+                dataList.addLast(new PacketData(ax, ay, az, a_flag, b_flag));
+                if (a_flag == 1) hitCounter++;
 
-                if(dataList.size() == datasize){
-                    if(hitCounter>damage_hit_count_threshold){
-                        makecsv();
+                if (dataList.size() == datasize) {
+                    if (hitCounter > damage_hit_count_threshold) {
+                        makeCsv();
                         dataList.clear();
-                    }
-                    else{
+                    } else {
                         dataList.removeFirst();
                     }
                 }
@@ -122,10 +120,10 @@ public class samplingmng {
         }
     }
 
-    public void makecsv() {
+    public void makeCsv() {
         //csvファイルの保存
         Player p = Bukkit.getPlayer(this.a_uuid);
-        if(lastFileNum == null) getLastname();
+        if (lastFileNum == null) getLastname();
         lastFileNum++;
         p.sendMessage(String.valueOf(lastFileNum));
         File csvFile = new File(plugin.getDataFolder(), "data_" + lastFileNum + ".csv");
@@ -145,13 +143,13 @@ public class samplingmng {
 
                 int idx = 0;
 
-                for (packetdata pd : dataList) {
+                for (PacketData pd : dataList) {
                     double x = pd.X;
                     double y = pd.Y;
                     double z = pd.Z;
                     double a = pd.a_hit;
                     double b = pd.b_hit;
-                    writer.write(String.valueOf(idx) + "," + String.valueOf(x) + "," + String.valueOf(y) + "," + String.valueOf(z) + "," + String.valueOf(a) + "," + String.valueOf(b));
+                    writer.write(idx + "," + x + "," + y + "," + z + "," + a + "," + b);
                     writer.newLine();
                     idx++;
                 }

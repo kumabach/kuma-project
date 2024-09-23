@@ -1,12 +1,12 @@
-package me.kuma.kumaanticheat.forsampling;
+package me.kuma.kumaanticheat.sampling;
 
 import java.util.Objects;
 
-public class pairdata<K, V> {
+public class PairData<K, V> {
     public final K key;
     public final V value;
 
-    public pairdata(K key, V value) {
+    public PairData(K key, V value) {
         this.key = key;
         this.value = value;
     }
@@ -23,7 +23,7 @@ public class pairdata<K, V> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        pairdata<?, ?> pair = (pairdata<?, ?>) o;
+        PairData<?, ?> pair = (PairData<?, ?>) o;
         return Objects.equals(key, pair.key) && Objects.equals(value, pair.value);
     }
 

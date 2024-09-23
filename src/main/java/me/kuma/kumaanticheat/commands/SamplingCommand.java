@@ -1,29 +1,30 @@
 package me.kuma.kumaanticheat.commands;
 
 import me.kuma.kumaanticheat.KumaAntiCheat;
-import me.kuma.kumaanticheat.forsampling.samplingmng;
-import me.kuma.kumaanticheat.forsampling.pairdata;
+import me.kuma.kumaanticheat.sampling.PairData;
+import me.kuma.kumaanticheat.sampling.SamplingMng;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
 import java.util.UUID;
 
-public class startSampling implements CommandExecutor {
+public class SamplingCommand implements CommandExecutor {
 
     private final KumaAntiCheat plugin;
 
     // コンストラクタでKumaAntiCheatのインスタンスを受け取る
-    public startSampling(KumaAntiCheat plugin) {
+    public SamplingCommand(KumaAntiCheat plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if(args.length!=3){
+        if (args.length != 3) {
             sender.sendMessage("/sampling start/stop playerA playerB");
             return false;
         }
@@ -31,7 +32,7 @@ public class startSampling implements CommandExecutor {
         Player a = Bukkit.getPlayer(args[1]);
         Player b = Bukkit.getPlayer(args[2]);
 
-        if(a==null||b==null){
+        if (a == null || b == null) {
             sender.sendMessage(ChatColor.RED + "No such player.");
             return false;
         }
@@ -46,39 +47,37 @@ public class startSampling implements CommandExecutor {
 
         UUID a_uuid = a.getUniqueId();
         UUID b_uuid = b.getUniqueId();
-        pairdata<UUID, UUID> pd = new pairdata<>(a_uuid, b_uuid);
+        PairData<UUID, UUID> pd = new PairData<>(a_uuid, b_uuid);
 
-        if(args[0].equalsIgnoreCase("start")){
-            if(!startsamp(pd)){
+        if (args[0].equalsIgnoreCase("start")) {
+            if (!startSampling(pd)) {
                 sender.sendMessage(ChatColor.RED + "The task has already started!");
                 return false;
             }
-        }
-        else if(args[0].equalsIgnoreCase("stop")){
-            if(!stopsamp(pd)){
+        } else if (args[0].equalsIgnoreCase("stop")) {
+            if (!stopSampling(pd)) {
                 sender.sendMessage(ChatColor.RED + "The task does not exist!");
                 return false;
             }
-        }
-        else return false;
+        } else return false;
         return true;
     }
 
-    private boolean startsamp(pairdata pd){
-        samplingmng s = samplingmng.sampmap.get(pd);
-        if(s==null){
-            samplingmng newsamp = new samplingmng(this.plugin,pd);
-            samplingmng.sampmap.put(pd, newsamp);
-        } else if (s.task!=null)return false;
+    private boolean startSampling(PairData pd) {
+        SamplingMng s = SamplingMng.sampmap.get(pd);
+        if (s == null) {
+            SamplingMng newsamp = new SamplingMng(this.plugin, pd);
+            SamplingMng.sampmap.put(pd, newsamp);
+        } else if (s.task != null) return false;
 
-        samplingmng.sampmap.get(pd).startTracking();
+        SamplingMng.sampmap.get(pd).startTracking();
         return true;
     }
 
-    private boolean stopsamp(pairdata pd){
-        samplingmng s = samplingmng.sampmap.get(pd);
-        if(s==null||s.task==null)return false;
-        samplingmng.sampmap.get(pd).stopTracking();
+    private boolean stopSampling(PairData pd) {
+        SamplingMng s = SamplingMng.sampmap.get(pd);
+        if (s == null || s.task == null) return false;
+        SamplingMng.sampmap.get(pd).stopTracking();
         return true;
     }
 }
