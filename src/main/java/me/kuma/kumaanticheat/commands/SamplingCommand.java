@@ -10,11 +10,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 public class SamplingCommand implements CommandExecutor {
 
     private final KumaAntiCheat plugin;
+    public static HashMap<String, Integer> types = new HashMap<>();
 
     // コンストラクタでKumaAntiCheatのインスタンスを受け取る
     public SamplingCommand(KumaAntiCheat plugin) {
@@ -24,7 +26,7 @@ public class SamplingCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (args.length != 3) {
+        if (args.length != 4) {
             sender.sendMessage("/sampling start/stop playerA playerB");
             return false;
         }
@@ -37,20 +39,16 @@ public class SamplingCommand implements CommandExecutor {
             return false;
         }
 
-//        int result = args[1].compareToIgnoreCase(args[2]);
-//
-//        if(result<0){
-//            Player r = a;
-//            a=b;
-//            b=r; //swap
-//        }
+        Integer integertype = types.get(args[3].toLowerCase());
+        if(integertype == null) return false;
+        int type = integertype;
 
         UUID a_uuid = a.getUniqueId();
         UUID b_uuid = b.getUniqueId();
         PairData<UUID, UUID> pd = new PairData<>(a_uuid, b_uuid);
 
         if (args[0].equalsIgnoreCase("start")) {
-            if (!startSampling(pd)) {
+            if (!startSampling(pd, type)) {
                 sender.sendMessage(ChatColor.RED + "The task has already started!");
                 return false;
             }
@@ -63,10 +61,10 @@ public class SamplingCommand implements CommandExecutor {
         return true;
     }
 
-    private boolean startSampling(PairData pd) {
+    private boolean startSampling(PairData pd, int t) {
         SamplingMng s = SamplingMng.sampmap.get(pd);
         if (s == null) {
-            SamplingMng newsamp = new SamplingMng(this.plugin, pd);
+            SamplingMng newsamp = new SamplingMng(this.plugin, pd, t);
             SamplingMng.sampmap.put(pd, newsamp);
         } else if (s.task != null) return false;
 
@@ -79,5 +77,10 @@ public class SamplingCommand implements CommandExecutor {
         if (s == null || s.task == null) return false;
         SamplingMng.sampmap.get(pd).stopTracking();
         return true;
+    }
+
+    static void typeTypeEnumerate(){
+        types.put("legit", 0);
+        types.put("bhop", 1);
     }
 }
