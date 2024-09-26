@@ -8,6 +8,7 @@ public final class KumaAntiCheat extends JavaPlugin {
     @Override
     public void onEnable() {
 
+        SamplingCommand.TypeEnumerate();
         this.getCommand("sampling").setExecutor(new SamplingCommand(this));
         getServer().getPluginManager().registerEvents(new DealDamageListener(), this);
 

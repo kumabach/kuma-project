@@ -31,12 +31,11 @@ public class SamplingMng {
     public UUID b_uuid;
     private final JavaPlugin plugin;
     private int hitCounter;
-    int playerType;
+    public int playerType;
 
     // コンストラクタでJavaPluginのインスタンスを受け取る
-    public SamplingMng(JavaPlugin plugin, PairData pd, int type) {
+    public SamplingMng(JavaPlugin plugin, PairData pd) {
         this.plugin = plugin;
-        this.playerType = type;
         a_uuid = (UUID) pd.getKey();
         b_uuid = (UUID) pd.getValue();
     }
@@ -95,6 +94,11 @@ public class SamplingMng {
                 A.sendMessage(String.valueOf(a_flag));
                 B.sendMessage(String.valueOf(a_flag));
 
+                if(ax== 0 && az == 0) {
+                    hitCounter = 0;
+                    dataList.clear();
+                }
+
                 if (dataList.size() == datasize) {
                     if (hitCounter > damage_hit_count_threshold) {
                         makeCsv();
@@ -120,20 +124,22 @@ public class SamplingMng {
             task.cancel();
             task = null;
             dataList.clear();
+            lastFileNum = null;
         }
     }
 
     public void makeCsv() {
         // CSVファイルの保存
         Player p = Bukkit.getPlayer(this.a_uuid);
-        if (lastFileNum == null) getLastname();
-        lastFileNum++;
 
         // プレイヤータイプのディレクトリを作成
         File playerTypeDir = new File(plugin.getDataFolder(), "PlayerType_" + playerType);
         playerTypeDir.mkdirs();
 
-        File csvFile = new File(playerTypeDir, "data_" + lastFileNum + ".csv");
+        if (lastFileNum == null) getLastname(playerTypeDir);
+        lastFileNum++;
+
+        File csvFile = new File(playerTypeDir, "type_" + playerType + "_" + lastFileNum + ".csv");
 
         try {
             csvFile.createNewFile();
@@ -160,7 +166,7 @@ public class SamplingMng {
                     double b = pd.b_hit;
 
                     double r = Math.sqrt(x * x + z * z);
-                    double theta1 = Math.atan2(z, x); // polar変換
+                    double theta1 = Math.atan2(z, x);
                     double theta2, theta3;
 
                     theta2 = theta1 - pi * 2;
@@ -203,8 +209,8 @@ public class SamplingMng {
         else return a;
     }
 
-    public void getLastname() {
-        File[] files = this.plugin.getDataFolder().listFiles((dir, name) -> name.startsWith("data_") && name.endsWith(".csv"));
+    public void getLastname(File td) {
+        File[] files = td.listFiles((dir, name) -> name.startsWith("type_") && name.endsWith(".csv"));
 
         lastFileNum = 0;
 

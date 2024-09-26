@@ -64,10 +64,11 @@ public class SamplingCommand implements CommandExecutor {
     private boolean startSampling(PairData pd, int t) {
         SamplingMng s = SamplingMng.sampmap.get(pd);
         if (s == null) {
-            SamplingMng newsamp = new SamplingMng(this.plugin, pd, t);
-            SamplingMng.sampmap.put(pd, newsamp);
+            s = new SamplingMng(this.plugin, pd);
+            SamplingMng.sampmap.put(pd, s);
         } else if (s.task != null) return false;
 
+        s.playerType = t;
         SamplingMng.sampmap.get(pd).startTracking();
         return true;
     }
@@ -79,7 +80,7 @@ public class SamplingCommand implements CommandExecutor {
         return true;
     }
 
-    static void typeTypeEnumerate(){
+    public static void TypeEnumerate(){
         types.put("legit", 0);
         types.put("bhop", 1);
     }
