@@ -144,10 +144,9 @@ public class SamplingMng {
             csvFile.createNewFile();
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile, true))) {
-                writer.write("index,dr,dtheta,dy,a,b");
+                writer.write("dr,dtheta,dy,a,b");
                 writer.newLine();
 
-                int idx = 0;
                 double fx = dataList.getFirst().X;
                 double fz = dataList.getFirst().Z;
 
@@ -192,9 +191,8 @@ public class SamplingMng {
                     lastr = r;
                     lasty = y;
 
-                    writer.write(idx + "," + dr + "," + dtheta + "," + dy + "," + a + "," + b);
+                    writer.write(dr + "," + dtheta + "," + dy + "," + a + "," + b);
                     writer.newLine();
-                    idx++;
                 }
             }
 
