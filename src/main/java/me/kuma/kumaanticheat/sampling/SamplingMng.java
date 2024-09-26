@@ -22,7 +22,6 @@ public class SamplingMng {
     static final long clt = 100;
     static final int datasize = 91;
     static final int damage_hit_count_threshold = 10;
-    static final double pi = 3.1415926353;
     public static HashMap<PairData, SamplingMng> sampmap = new HashMap<>();
     public static Integer lastFileNum;
     public Deque<PacketData> dataList = new ArrayDeque<>();
@@ -169,18 +168,18 @@ public class SamplingMng {
                     double theta1 = Math.atan2(z, x);
                     double theta2, theta3;
 
-                    theta2 = theta1 - pi * 2;
-                    theta3 = theta1 + pi * 2;
+                    theta2 = theta1 - Math.PI * 2;
+                    theta3 = theta1 + Math.PI * 2;
 
                     double now = theta1;
                     double dt = lastTheta - theta1;
 
-                    if (abs(dt) > abs(lastTheta - theta2)) {
+                    if (Math.abs(dt) > Math.abs(lastTheta - theta2)) {
                         dt = lastTheta - theta2;
                         now = theta2;
                     }
 
-                    if (abs(dt) > abs(lastTheta - theta3)) {
+                    if (Math.abs(dt) > Math.abs(lastTheta - theta3)) {
                         dt = lastTheta - theta3;
                         now = theta3;
                     }
@@ -202,11 +201,6 @@ public class SamplingMng {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private double abs(double a) {
-        if(a<(double)0)return (double)-1*a;
-        else return a;
     }
 
     public void getLastname(File td) {
