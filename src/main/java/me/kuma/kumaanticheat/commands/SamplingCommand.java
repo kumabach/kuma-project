@@ -77,6 +77,7 @@ public class SamplingCommand implements CommandExecutor {
         SamplingMng s = SamplingMng.sampmap.get(pd);
         if (s == null || s.task == null) return false;
         SamplingMng.sampmap.get(pd).stopTracking();
+        SamplingMng.sampmap.remove(pd);
         return true;
     }
 
