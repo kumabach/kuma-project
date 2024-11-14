@@ -15,6 +15,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.UUID;
 
+import static com.google.common.primitives.UnsignedBytes.min;
 import static sun.swing.MenuItemLayoutHelper.max;
 
 public class SamplingMng {
@@ -62,10 +63,6 @@ public class SamplingMng {
                 double by = B.getLocation().getY();
                 double bz = B.getLocation().getZ();
 
-                ax -= bx;
-                ay -= by;
-                az -= bz;
-
                 long t = System.currentTimeMillis();
 
                 int a_flag;
@@ -87,11 +84,8 @@ public class SamplingMng {
                     b_flag = (t - lasthit > clt ? 0 : 1);
                 }
 
-                dataList.addLast(new PacketData(ax, ay, az, a_flag, b_flag));
+                dataList.addLast(new PacketData(a_flag, b_flag, ax, ay, az, bx, by, bz));
                 if (a_flag == 1) hitCounter++;
-
-                A.sendMessage(String.valueOf(a_flag));
-                B.sendMessage(String.valueOf(a_flag));
 
                 if(ax== 0 && az == 0) {
                     hitCounter = 0;
@@ -144,7 +138,7 @@ public class SamplingMng {
             csvFile.createNewFile();
 
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile, true))) {
-                writer.write("dr,dtheta,dy,a");
+                writer.write("r,dt,dy,a,b,ax,ay,az,bx,by,bz");
                 writer.newLine();
 
                 double fx = dataList.getFirst().X;
@@ -157,41 +151,43 @@ public class SamplingMng {
                 dataList.removeFirst();
 
                 for (PacketData pd : dataList) {
-                    double x = pd.X;
-                    double y = pd.Y;
-                    double z = pd.Z;
+
                     double a = pd.a_hit;
                     double b = pd.b_hit;
 
-                    double r = Math.sqrt(x * x + z * z);
-                    double theta1 = Math.atan2(z, x);
-                    double theta2, theta3;
+                    double ax = pd.Ax;
+                    double ay = pd.Ay;
+                    double az = pd.Az;
+                    double bx = pd.Bx;
+                    double by = pd.By;
+                    double bz = pd.Bz;
 
+                    //aaaa
+
+                    double r = Math.sqrt(x * x + z * z);
+
+                    double theta1, theta2, theta3;
+
+                    theta1 = Math.atan2(z, x);
                     theta2 = theta1 - Math.PI * 2;
                     theta3 = theta1 + Math.PI * 2;
 
-                    double now = theta1;
-                    double dt = lastTheta - theta1;
+                    double dt1 = Math.abs(lastTheta - theta1);
+                    double dt2 = Math.abs(lastTheta - theta2);
+                    double dt3 = Math.abs(lastTheta - theta3);
 
-                    if (Math.abs(dt) > Math.abs(lastTheta - theta2)) {
-                        dt = lastTheta - theta2;
-                        now = theta2;
-                    }
 
-                    if (Math.abs(dt) > Math.abs(lastTheta - theta3)) {
-                        dt = lastTheta - theta3;
-                        now = theta3;
-                    }
+                    double dt = Math.min(Math.min(dt1, dt2),dt3);
 
-                    double dr = r - lastr;
-                    double dtheta = dt;
-                    double dy = y - lasty;
+                    lastTheta = theta1;
 
-                    lastTheta = now;
-                    lastr = r;
-                    lasty = y;
+                    //
 
-                    writer.write(r + "," + dtheta + "," + y + "," + a);
+                    double xx =
+
+
+
+                    writer.write(r + "," + dt + "," + y + "," + a + "," + b + "," + ax + "," + ay + "," + az + "," + bx + "," + by + "," + bz);
                     writer.newLine();
                 }
             }

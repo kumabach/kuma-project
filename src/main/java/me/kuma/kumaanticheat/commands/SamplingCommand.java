@@ -52,12 +52,14 @@ public class SamplingCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "The task has already started!");
                 return false;
             }
+            sender.sendMessage(ChatColor.GREEN + "Sampling has been started");
         } else if (args[0].equalsIgnoreCase("stop")) {
             if (!stopSampling(pd)) {
                 sender.sendMessage(ChatColor.RED + "The task does not exist!");
                 return false;
-            }
+            } else sender.sendMessage(ChatColor.GREEN + "Sampling has been stopped");
         } else return false;
+
         return true;
     }
 
